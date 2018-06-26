@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Model\Advert;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
+use App\Library\FileManager;
 
 class AdvertController extends Controller
 {
@@ -14,17 +17,7 @@ class AdvertController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        Advert::latest()->get();
     }
 
     /**
@@ -35,7 +28,24 @@ class AdvertController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $advert = new Advert();
+        $advert->user_id = Auth()->user()->id;
+        $advert->week = $request->week;
+        $advert->date = date('Y-m-d H:i:s', strtotime($request->date));
+        if($request->hasFile('horizontal')){
+            $advert->horizontal = FileManager::store($request->horizontal);
+        }
+
+        if($request->hasFile('vertical')){
+            $advert->vertical = FileManager::store($request->vertical);
+        }
+        $advert->status = $request->status;
+        $advert->starting = date('Y-m-d H:i:s', strtotime($request->starting));
+
+        $advert->save();
+
+        return response('Advert Created', Response::HTTP_CREATED);
+
     }
 
     /**
@@ -45,17 +55,6 @@ class AdvertController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(Advert $advert)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Model\Advert  $advert
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Advert $advert)
     {
         //
     }
