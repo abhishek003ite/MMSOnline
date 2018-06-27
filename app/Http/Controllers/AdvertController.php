@@ -11,13 +11,23 @@ use App\Library\FileManager;
 class AdvertController extends Controller
 {
     /**
+     * Create a new AuthController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('JWT', ['except' => ['index', 'show']]);
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        Advert::latest()->get();
+        return Advert::latest()->get();
     }
 
     /**
@@ -56,7 +66,7 @@ class AdvertController extends Controller
      */
     public function show(Advert $advert)
     {
-        //
+        return $advert;
     }
 
     /**
@@ -68,7 +78,8 @@ class AdvertController extends Controller
      */
     public function update(Request $request, Advert $advert)
     {
-        //
+        $advert->update($request->all());
+        return response('Advert Updated', Response::HTTP_ACCEPTED);
     }
 
     /**
@@ -79,6 +90,7 @@ class AdvertController extends Controller
      */
     public function destroy(Advert $advert)
     {
-        //
+        $advert->delete();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }
