@@ -27,6 +27,9 @@ import Layout from '../components/layout/Layout'
 import Login from '../components/login'
 import Dashboard from '../components/dashboard'
 import Documentation from '../components/documentation'
+import Permission from '../components/permission/page.vue'
+import PermissionDirective from '../components/permission/directive.vue'
+import SvgIcon from '../components/svg-icons'
 export const constantRouterMap = [
   { path: '/login', component: Login , hidden: true },
 //   { path: '/authredirect', component: () => import('@/views/login/authredirect'), hidden: true },
@@ -74,45 +77,45 @@ export default new Router({
 })
 
 export const asyncRouterMap = [
-//   {
-//     path: '/permission',
-//     component: Layout,
-//     redirect: '/permission/index',
-//     alwaysShow: true, // will always show the root menu
-//     meta: {
-//       title: 'permission',
-//       icon: 'lock',
-//       roles: ['admin', 'editor'] // you can set roles in root nav
-//     },
-//     children: [{
-//       path: 'page',
-//       component: () => import('@/views/permission/page'),
-//       name: 'pagePermission',
-//       meta: {
-//         title: 'pagePermission',
-//         roles: ['admin'] // or you can only set roles in sub nav
-//       }
-//     }, {
-//       path: 'directive',
-//       component: () => import('@/views/permission/directive'),
-//       name: 'directivePermission',
-//       meta: {
-//         title: 'directivePermission'
-//         // if do not set roles, means: this page does not require permission
-//       }
-//     }]
-//   },
+  {
+    path: '/permission',
+    component: Layout,
+    redirect: '/permission/index',
+    alwaysShow: true, // will always show the root menu
+    meta: {
+      title: 'permission',
+      icon: 'lock',
+      roles: ['admin', 'editor'] // you can set roles in root nav
+    },
+    children: [{
+      path: 'page',
+      component: Permission,
+      name: 'pagePermission',
+      meta: {
+        title: 'pagePermission',
+        roles: ['admin'] // or you can only set roles in sub nav
+      }
+    }, {
+      path: 'directive',
+      component: PermissionDirective,
+      name: 'directivePermission',
+      meta: {
+        title: 'directivePermission'
+        // if do not set roles, means: this page does not require permission
+      }
+    }]
+  },
 
-//   {
-//     path: '/icon',
-//     component: Layout,
-//     children: [{
-//       path: 'index',
-//       component: () => import('@/views/svg-icons/index'),
-//       name: 'icons',
-//       meta: { title: 'icons', icon: 'icon', noCache: true }
-//     }]
-//   },
+  {
+    path: '/icon',
+    component: Layout,
+    children: [{
+      path: 'index',
+      component: SvgIcon,
+      name: 'icons',
+      meta: { title: 'icons', icon: 'icon', noCache: true }
+    }]
+  },
 
 //   {
 //     path: '/components',

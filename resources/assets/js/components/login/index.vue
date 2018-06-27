@@ -2,47 +2,50 @@
   <div class="login-container">
     <el-form class="login-form" autoComplete="on" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left">
       <div class="title-container">
-        <h3 class="title">{{ $t('login.title') }}</h3>
-        <lang-select class="set-language"></lang-select>
+        <h3 class="title">MMS Online</h3>
+        <!-- <lang-select class="set-language"></lang-select> -->
       </div>
       <el-form-item prop="username">
         <span class="svg-container svg-container_login">
-          <svg-icon icon-class="user" />
+          <!-- <svg-icon icon-class="user" /> -->
+          <icon name="user"></icon>
         </span>
-        <el-input name="username" type="text" v-model="loginForm.username" autoComplete="on" placeholder="username" />
+        <el-input name="email" type="text" v-model="loginForm.email" autoComplete="on" placeholder="username" />
       </el-form-item>
 
       <el-form-item prop="password">
         <span class="svg-container">
-          <svg-icon icon-class="password" />
+          <!-- <svg-icon icon-class="password" /> -->
+          <icon name="key"></icon>
         </span>
         <el-input name="password" :type="passwordType" @keyup.enter.native="handleLogin" v-model="loginForm.password" autoComplete="on" placeholder="password" />
         <span class="show-pwd" @click="showPwd">
-          <svg-icon icon-class="eye" />
+          <!-- <svg-icon icon-class="eye" /> -->
+          <icon name="eye"></icon>
         </span>
       </el-form-item>
 
-      <el-button type="primary" style="width:100%;margin-bottom:30px;" :loading="loading" @click.native.prevent="handleLogin">{{$t('login.logIn')}}</el-button>
+      <el-button type="primary" style="width:100%;margin-bottom:30px;" :loading="loading" @click.native.prevent="handleLogin">LogIn</el-button>
 
-      <div class="tips">
+      <!-- <div class="tips">
         <span>{{$t('login.username')}} : admin</span>
         <span>{{$t('login.password')}} : {{$t('login.any')}}</span>
       </div>
       <div class="tips">
         <span style="margin-right:18px;">{{$t('login.username')}} : editor</span>
         <span>{{$t('login.password')}} : {{$t('login.any')}}</span>
-      </div>
+      </div> -->
 
-      <el-button class="thirdparty-button" type="primary" @click="showDialog=true">{{$t('login.thirdparty')}}</el-button>
+      <!-- <el-button class="thirdparty-button" type="primary" @click="showDialog=true">{{$t('login.thirdparty')}}</el-button> -->
     </el-form>
 
-    <el-dialog :title="$t('login.thirdparty')" :visible.sync="showDialog" append-to-body>
-      {{$t('login.thirdpartyTips')}}
-      <br/>
+    <!-- <el-dialog :title="$t('login.thirdparty')" :visible.sync="showDialog" append-to-body>
+      <!-- {{$t('login.thirdpartyTips')}} -->
+      <!-- <br/>
       <br/>
       <br/>
       <social-sign />
-    </el-dialog>
+    </el-dialog> -->
 
   </div>
 </template>
@@ -72,11 +75,11 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '1111111'
+        email: '',
+        password: ''
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        // username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       passwordType: 'password',
@@ -96,11 +99,11 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
-            this.loading = false
-            this.$router.push({ path: '/' })
+          axios.post('/api/auth/login', this.loginForm).then(() => {
+              this.loading = false
+              this.$router.push({ path: '/' })
           }).catch(() => {
-            this.loading = false
+              this.loading = false
           })
         } else {
           console.log('error submit!!')
