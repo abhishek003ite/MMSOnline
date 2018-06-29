@@ -1,9 +1,19 @@
 <template>
-  <div class="login-container">
+    <div class="login-container">
     <el-form class="login-form" autoComplete="on" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left">
       <div class="title-container">
-        <h3 class="title">MMS Online</h3>
-        <!-- <lang-select class="set-language"></lang-select> -->
+        <!-- <h3 class="title">MMS Online</h3> -->
+        <div class="login_page_wrapper">
+            <div class="md-card1">
+                <div class="md-card-content large-padding">
+                    <div class="login_heading">
+                        <div class="user_avatar">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
       </div>
       <el-form-item prop="username">
         <span class="svg-container svg-container_login">
@@ -40,7 +50,7 @@
     </el-form>
 
     <!-- <el-dialog :title="$t('login.thirdparty')" :visible.sync="showDialog" append-to-body>
-      <!-- {{$t('login.thirdpartyTips')}} -->
+      <! {{$t('login.thirdpartyTips')}} -->
       <!-- <br/>
       <br/>
       <br/>
@@ -51,91 +61,73 @@
 </template>
 
 <script>
-import { isvalidUsername } from '../../utils/validate'
-import LangSelect from '../LangSelect'
-import SocialSign from './socialsignin'
-
+import { validateEmail } from '../../utils/validate.js'
+import AppStorage from '../../Helpers/AppStorage.js'
+import Token from '../../Helpers/Token.js'
 export default {
-  components: { LangSelect, SocialSign },
-  name: 'login',
-  data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!isvalidUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
-    }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
-      } else {
-        callback()
-      }
-    }
-    return {
-      loginForm: {
-        email: '',
-        password: ''
-      },
-      loginRules: {
-        // username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
-      },
-      passwordType: 'password',
-      loading: false,
-      showDialog: false
-    }
-  },
-  methods: {
-    showPwd() {
-      if (this.passwordType === 'password') {
-        this.passwordType = ''
-      } else {
-        this.passwordType = 'password'
-      }
-    },
-    handleLogin() {
-      this.$refs.loginForm.validate(valid => {
-        if (valid) {
-          this.loading = true
-          axios.post('/api/auth/login', this.loginForm).then(() => {
-              this.loading = false
-              this.$router.push({ path: '/' })
-          }).catch(() => {
-              this.loading = false
-          })
-        } else {
-          console.log('error submit!!')
-          return false
+    name: 'login',
+    data() {
+        const validateEmail = (rule, value, callback) => {
+            console.log(validateEmail(value))
         }
-      })
+        const validatePassword = (rule, value, callback) => {
+            if (value.length < 6) {
+                callback(new Error('The password can not be less than 6 digits'))
+            } else {
+                callback()
+            }
+        }
+        return {
+            loginForm: {
+                email: null,
+                password: null
+            },
+            loginRules: {
+                email: [{required: true, trigger: 'blur', validator: validateEmail}],
+                password: [{required: true, trigger: 'blur', validator: validatePassword}]
+            },
+            passwordType: 'password',
+            loading: false,
+            showDialog: false
+        }
     },
-    afterQRScan() {
-      // const hash = window.location.hash.slice(1)
-      // const hashObj = getQueryObject(hash)
-      // const originUrl = window.location.origin
-      // history.replaceState({}, '', originUrl)
-      // const codeMap = {
-      //   wechat: 'code',
-      //   tencent: 'code'
-      // }
-      // const codeName = hashObj[codeMap[this.auth_type]]
-      // if (!codeName) {
-      //   alert('第三方登录失败')
-      // } else {
-      //   this.$store.dispatch('LoginByThirdparty', codeName).then(() => {
-      //     this.$router.push({ path: '/' })
-      //   })
-      // }
+    created() {
+        if(User.loggedIn()){
+            this.$router.push({ name: 'signup' })
+        }
+    },
+    methods: {
+        showPwd() {
+            if (this.passwordType === 'password') {
+                this.passwordType = ''
+            } else {
+                this.passwordType = 'password'
+            }
+        },
+        handleLogin() {
+            this.$refs.loginForm.validate(valid => {
+                if(valid) {
+                    this.loading = true
+                    axios.post('/api/auth/login', this.loginForm)
+                    .then((res) => {
+                        const access_token = res.data.access_token
+                        const user = res.data.user
+                        if(Token.isValid(access_token)){
+                            AppStorage.store(access_token, user)
+                            console.log('Hi');
+                            this.$router.push({ name: 'signup' })
+                        }else{
+                            console.log('Hello')
+                        }
+                    })
+                    .catch(error => console.log(error.response))
+                }else{
+                    console.log('Not Valid')
+                    return false
+                }
+            })
+        }
     }
-  },
-  created() {
-    // window.addEventListener('hashchange', this.afterQRScan)
-  },
-  destroyed() {
-    // window.removeEventListener('hashchange', this.afterQRScan)
-  }
 }
 </script>
 
@@ -176,6 +168,29 @@ $light_gray:#eee;
 $bg:#2d3a4b;
 $dark_gray:#889aa4;
 $light_gray:#eee;
+
+.login_page_wrapper {
+    width: 360px;
+    max-width: 100%;
+    margin: 0 auto;
+    transition: all 280ms cubic-bezier(.4, 0, .2, 1);
+}
+
+.login_heading {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.user_avatar {
+    width: 160px;
+    height: 160px;
+    background-image: url('../../assets/imgs/logoW.png');
+    background-size: 100% 100%;
+    display: inline-block;
+    text-align: center;
+    border-radius: 50%;
+    background-repeat: no-repeat;
+}
 
 .login-container {
   position: fixed;

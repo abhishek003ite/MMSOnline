@@ -1,12 +1,13 @@
 <template>
-    <login></login>
+    <router-view></router-view>
 </template>
 
 <script>
-import Login from './login/index'
 export default {
-    components: {
-        Login
+    created(){
+        EventBus.$on('logout', () => {
+            User.logout()
+        })
     }
 }
 </script>
